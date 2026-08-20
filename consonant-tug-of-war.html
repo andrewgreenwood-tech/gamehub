@@ -73,7 +73,16 @@
     font-size: 0.82rem;
     outline: none;
   }
-  .category-input { width: 130px; font-weight: 700; color: #f59e0b; }
+  .category-input {
+    width: 170px; /* Slightly wider default width */
+    max-width: 100%;
+    font-weight: 700;
+    color: #f59e0b;
+    text-overflow: ellipsis; /* Adds "..." if text is too long */
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.82rem;
+  }
   .target-input, .timer-input { width: 45px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; }
   
   .icon-btn {
