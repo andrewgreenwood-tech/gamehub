@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STEPS STOP!</title>
+<style>
+:root{
+  --bg:#10171b; --panel:#1c252b; --panel2:#151d22; --line:#34434d;
+  --text:#f1f4f6; --muted:#9aa9b3; --accent:#a184ef; --green:#20c76b;
+  --gold:#ffbf38; --pink:#ef4e9b; --blue:#4194ff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; background:radial-gradient(circle at top,#1a252b 0,#10171b 50%);
+  color:var(--text); font-family:Arial,Helvetica,sans-serif;
+}
+.wrap{max-width:1250px;margin:0 auto;padding:16px 20px 35px}
+h1{text-align:center;margin:0 0 12px;color:var(--accent);letter-spacing:1.5px;font-size:30px}
+.panel{background:rgba(28,37,43,.97);border:1px solid var(--line);border-radius:10px;padding:11px}
+.setup{
+  display:grid;grid-template-columns:repeat(5,1fr) 100px 110px 100px;gap:7px;align-items:end
+}
+label{display:block;color:#9fb1bd;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin:0 0 4px 3px}
+input,select,button{
+  font:inherit;border-radius:5px;border:1px solid #3b4b56;color:var(--text);background:#11191e;height:36px
+}
+input,select{padding:0 9px;width:100%}
+button{padding:0 11px;cursor:pointer;font-weight:800}
+button:hover{filter:brightness(1.1)}
+.random{background:#29343c}.start{background:#1dbb62;border-color:#25d877}.stop{background:#d43d50}.secondary{background:#27333b}
+.timerbox{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:9px}
+.timer{font-size:30px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;min-width:100px;text-align:center}
+.status{color:var(--muted);font-size:13px}
+.letterBox{
+  margin:13px auto 10px; width:160px;text-align:center;background:#151e24;
+  border:1px solid #3c4d59;border-radius:10px;padding:8px
+}
+.letterLabel{font-size:10px;color:#8fa1ad;font-weight:800;text-transform:uppercase}
+.letter{font-size:52px;line-height:58px;font-weight:900;color:#fff}
+.boardWrap{overflow-x:auto}
+table{width:100%;min-width:760px;border-collapse:separate;border-spacing:4px}
+th,td{border:1px solid var(--line);border-radius:5px}
+th{background:#151e24;color:#b9c5cc;padding:8px 6px;font-size:12px}
+th.cat{color:#fff;font-size:13px}
+th.teamHead{width:110px;color:#73aaff}
+td{background:#192229;padding:5px}
+td.teamName{
+  text-align:left;padding-left:10px;font-weight:800;color:#73aaff;white-space:nowrap
+}
+td.answerCell input{height:40px;background:#11191e;border-color:#2f3d45;text-align:center}
+td.answerCell input:disabled{opacity:.55}
+td.pointsCell{
+  width:48px;text-align:center;font-weight:900;color:#73828c;background:#141c21
+}
+td.pointsCell.unique{color:#57dc8a}
+td.pointsCell.shared{color:var(--gold)}
+td.totalCell{text-align:center;font-weight:900;color:#fff;width:65px}
+tr.winner td{background:#3a321d}
+.scorebar{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.hidden{display:none!important}
+.instructions{
+  margin-top:12px;color:#82939d;font-size:12px;text-align:center
+}
+.results{margin-top:14px}
+.results h2{text-align:center;margin:2px 0 10px;font-size:19px}
+.rank{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.rankCard{
+  min-width:130px;padding:9px 12px;background:#151e24;border:1px solid #36464f;border-radius:7px;text-align:center
+}
+.rankCard.first{border-color:#a184ef;background:#2b253b}
+.rankCard .rname{font-weight:800;color:#9fb7c5}
+.rankCard .rscore{font-size:20px;font-weight:900;color:var(--gold)}
+@media(max-width:1000px){
+  .setup{grid-template-columns:repeat(2,1fr)}
+  .setup .cat{grid-column:span 2}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🛑 STEPS STOP!</h1>
+
+<div class="panel">
+  <div class="setup">
+    <div class="cat">
+      <label>Category 1</label><input id="cat0" placeholder="e.g. Animals">
+    </div>
+    <div class="cat">
+      <label>Category 2</label><input id="cat1" placeholder="e.g. Food">
+    </div>
+    <div class="cat">
+      <label>Category 3</label><input id="cat2" placeholder="e.g. Jobs">
+    </div>
+    <div class="cat">
+      <label>Category 4</label><input id="cat3" placeholder="e.g. Places">
+    </div>
+    <div class="cat">
+      <label>Category 5</label><input id="cat4" placeholder="e.g. Things at School">
+    </div>
+    <div>
+      <label>Teams</label>
+      <select id="teamCount">
+        <option>2</option><option>3</option><option>4</option><option>5</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+      </select>
+    </div>
+    <div>
+      <label>Timer</label>
+      <input id="seconds" type="number" min="5" max="600" value="60">
+    </div>
+    <button class="random" id="randomCatsBtn">🎲 Random</button>
+  </div>
+
+  <div class="scorebar">
+    <button class="start" id="startBtn">▶ Start</button>
+    <button class="stop hidden" id="stopBtn">🛑 STOP</button>
+  </div>
+
+  <div class="timerbox">
+    <div class="timer" id="timer">01:00</div>
+    <div class="status" id="status">Choose five categories, the number of teams and the timer.</div>
+  </div>
+</div>
+
+<div class="letterBox">
+  <div class="letterLabel">Letter</div>
+  <div class="letter" id="letter">?</div>
+</div>
+
+<div class="boardWrap">
+  <table>
+    <thead>
+      <tr id="headerRow">
+        <th class="teamHead">TEAM</th>
+        <th class="cat">Category 1</th>
+        <th class="cat">Category 2</th>
+        <th class="cat">Category 3</th>
+        <th class="cat">Category 4</th>
+        <th class="cat">Category 5</th>
+        <th>TOTAL</th>
+      </tr>
+    </thead>
+    <tbody id="grid"></tbody>
+  </table>
+</div>
+
+<div class="instructions">
+  After STOP, enter each team's five answers. Leave a box blank if they have no answer.
+  Unique answer = 10 points · Answer shared by 2+ teams = 5 points each · Blank = 0.
+</div>
+
+<div class="scorebar">
+  <button class="start hidden" id="scoreBtn">✓ Score Round</button>
+  <button class="secondary hidden" id="newRoundBtn">▶ New Round</button>
+  <button class="secondary hidden" id="resetBtn">↻ Reset Game</button>
+</div>
+
+<div id="results" class="results panel hidden">
+  <h2>🏆 Scores</h2>
+  <div class="rank" id="rank"></div>
+</div>
+</div>
+
+<script>
+const randomCategories=[
+ "Animals","Food","Jobs","Countries","Cities","Sports","Clothes","Transport",
+ "Things in a Classroom","Things in a House","Things in a Kitchen","Things at the Beach",
+ "Things in a Park","Things You Can Buy","Drinks","School Subjects","Hobbies",
+ "Things That Are Cold","Things That Are Hot","Things That Are Round","Adjectives",
+ "Verbs","Things You Can Take on Holiday","Famous People","Films","Books","Music",
+ "Things That Fly","Things That Are Green","Things That Are Red","Things in a Bedroom"
+];
+const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+let teams=[];
+let running=false, roundReady=false, timerId=null, timeLeft=60;
+let currentLetter="";
+
+const $=id=>document.getElementById(id);
+function formatTime(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function norm(s){return String(s||"").trim().toLowerCase().replace(/\s+/g," ")}
+function categories(){
+  return [0,1,2,3,4].map(i=>$("cat"+i).value.trim());
+}
+function setTimer(v){timeLeft=Math.max(0,parseInt(v)||60);$("timer").textContent=formatTime(timeLeft)}
+
+function buildTeams(keepScores=true){
+  const n=parseInt($("teamCount").value);
+  const old=teams;
+  teams=Array.from({length:n},(_,i)=>({
+    total:keepScores && old[i]?old[i].total:0,
+    answers:Array(5).fill(""),
+    points:Array(5).fill(0)
+  }));
+  renderGrid();
+}
+
+function renderGrid(){
+  const cats=categories();
+  const head=$("headerRow");
+  head.innerHTML='<th class="teamHead">TEAM</th>'+
+    cats.map((c,i)=>`<th class="cat">${escapeHtml(c||"Category "+(i+1))}</th>`).join("")+
+    '<th>TOTAL</th>';
+  const grid=$("grid"); grid.innerHTML="";
+  teams.forEach((t,ti)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="teamName">TEAM ${ti+1}</td>`+
+      t.answers.map((a,ci)=>`
+        <td class="answerCell">
+          <input id="a-${ti}-${ci}" value="${escapeAttr(a)}" placeholder="—" ${roundReady?"":"disabled"}>
+        </td>`).join("")+
+      `<td class="totalCell" id="total-${ti}">${t.total}</td>`;
+    grid.appendChild(tr);
+    t.answers.forEach((a,ci)=>{
+      const inp=$(`a-${ti}-${ci}`);
+      inp.addEventListener("input",()=>t.answers[ci]=inp.value);
+    });
+  });
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function escapeAttr(s){return escapeHtml(s)}
+
+$("randomCatsBtn").addEventListener("click",()=>{
+  const shuffled=[...randomCategories].sort(()=>Math.random()-.5);
+  shuffled.slice(0,5).forEach((c,i)=>$("cat"+i).value=c);
+  renderGrid();
+});
+
+$("teamCount").addEventListener("change",()=>{if(!running){buildTeams(true)}});
+
+$("seconds").addEventListener("change",()=>{if(!running)setTimer($("seconds").value)});
+
+function lockSetup(lock){
+  for(let i=0;i<5;i++)$("cat"+i).disabled=lock;
+  $("teamCount").disabled=lock;
+  $("seconds").disabled=lock;
+  $("randomCatsBtn").disabled=lock;
+}
+
+function chooseLetter(){
+  currentLetter=letters[Math.floor(Math.random()*letters.length)];
+  $("letter").textContent=currentLetter;
+}
+
+$("startBtn").addEventListener("click",()=>{
+  const cats=categories();
+  if(cats.some(c=>!c)){alert("Please enter all five categories, or use Random.");return}
+  clearInterval(timerId);
+  teams.forEach(t=>{t.answers=Array(5).fill("");t.points=Array(5).fill(0)});
+  renderGrid();
+  $("results").classList.add("hidden");
+  $("newRoundBtn").classList.add("hidden");
+  $("resetBtn").classList.add("hidden");
+  $("scoreBtn").classList.add("hidden");
+  chooseLetter();
+  setTimer($("seconds").value);
+  running=true;roundReady=false;
+  lockSetup(true);
+  $("startBtn").classList.add("hidden");
+  $("stopBtn").classList.remove("hidden");
+  $("status").textContent=`GO! Find words beginning with ${currentLetter}.`;
+  timerId=setInterval(()=>{
+    timeLeft--;
+    $("timer").textContent=formatTime(timeLeft);
+    if(timeLeft<=0) endRound();
+  },1000);
+});
+
+$("stopBtn").addEventListener("click",endRound);
+
+function endRound(){
+  if(!running)return;
+  clearInterval(timerId);timerId=null;running=false;roundReady=true;
+  $("timer").textContent="STOP!";
+  $("status").textContent=`Enter each team's answers for the letter ${currentLetter}. Then press Score Round.`;
+  $("stopBtn").classList.add("hidden");
+  $("scoreBtn").classList.remove("hidden");
+  $("startBtn").classList.add("hidden");
+  lockSetup(true);
+  renderGrid();
+  setTimeout(()=>{$("a-0-0")?.focus()},50);
+}
+
+$("scoreBtn").addEventListener("click",()=>{
+  teams.forEach((t,ti)=>t.answers.forEach((a,ci)=>{
+    const inp=$(`a-${ti}-${ci}`);
+    t.answers[ci]=inp?inp.value:"";
+  }));
+
+  for(let ci=0;ci<5;ci++){
+    const counts={};
+    teams.forEach(t=>{
+      const v=norm(t.answers[ci]);
+      if(v)counts[v]=(counts[v]||0)+1;
+    });
+    teams.forEach((t,ti)=>{
+      const v=norm(t.answers[ci]);
+      t.points[ci]=v?(counts[v]===1?10:5):0;
+    });
+  }
+  teams.forEach(t=>t.total+=t.points.reduce((a,b)=>a+b,0));
+  renderGrid();
+  teams.forEach((t,ti)=>{
+    t.points.forEach((p,ci)=>{
+      const cell=document.createElement("div");
+      const input=$(`a-${ti}-${ci}`);
+      if(input){
+        input.style.borderColor=p===10?"#57dc8a":p===5?"#ffbf38":"#2f3d45";
+      }
+    });
+  });
+  roundReady=false;
+  $("scoreBtn").classList.add("hidden");
+  $("newRoundBtn").classList.remove("hidden");
+  $("resetBtn").classList.remove("hidden");
+  $("status").textContent="Round scored. Play another round or reset the game.";
+  renderRanking();
+});
+
+function renderRanking(){
+  const max=Math.max(...teams.map(t=>t.total));
+  $("rank").innerHTML=teams.map((t,i)=>`
+    <div class="rankCard ${t.total===max?"first":""}">
+      <div class="rname">${t.total===max?"🏆 ":""}TEAM ${i+1}</div>
+      <div class="rscore">${t.total} pts</div>
+    </div>`).join("");
+  $("results").classList.remove("hidden");
+}
+
+$("newRoundBtn").addEventListener("click",()=>{
+  roundReady=false;
+  teams.forEach(t=>{t.answers=Array(5).fill("");t.points=Array(5).fill(0)});
+  $("results").classList.add("hidden");
+  $("newRoundBtn").classList.add("hidden");
+  $("resetBtn").classList.add("hidden");
+  $("startBtn").classList.remove("hidden");
+  $("scoreBtn").classList.add("hidden");
+  lockSetup(false);
+  $("letter").textContent="?";
+  setTimer($("seconds").value);
+  renderGrid();
+  $("status").textContent="Categories stay the same. Press Start for a new letter and round.";
+});
+
+$("resetBtn").addEventListener("click",()=>{
+  clearInterval(timerId);timerId=null;running=false;roundReady=false;
+  teams=[];buildTeams(false);
+  $("results").classList.add("hidden");
+  $("newRoundBtn").classList.add("hidden");
+  $("resetBtn").classList.add("hidden");
+  $("scoreBtn").classList.add("hidden");
+  $("startBtn").classList.remove("hidden");
+  $("stopBtn").classList.add("hidden");
+  lockSetup(false);
+  $("letter").textContent="?";
+  setTimer($("seconds").value);
+  $("status").textContent="Game reset. Choose five categories and start again.";
+});
+
+buildTeams(false);
+setTimer(60);
+</script>
+</body>
+</html>
