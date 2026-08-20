@@ -636,11 +636,29 @@
     "Things You Would Take on a Desert Island"
   ];
   
-  let categoriesPool = JSON.parse(localStorage.getItem('tugOfWarCategories')) || [...DEFAULT_CATEGORIES];
+  let categoriesPool = [
+    ...DEFAULT_CATEGORIES,
+    ...(JSON.parse(localStorage.getItem('tugOfWarCategories')) || [])
+  ].filter((category, index, array) =>
+    array.findIndex(
+      c => c.toLowerCase() === category.toLowerCase()
+    ) === index
+  );
+  
+  // Save the expanded category list
+  localStorage.setItem(
+    'tugOfWarCategories',
+    JSON.stringify(categoriesPool)
+  );
 
+  // Remember categories already used in the current cycle
+  let usedRandomCategories = JSON.parse(
+    localStorage.getItem('tugOfWarUsedRandomCategories')
+  ) || [];
+  
   let positions = {};
   let scores = { A: 0, B: 0 };
-
+  
   let timerInterval = null;
   let timeRemaining = 60;
   let isTimerRunning = false;
@@ -661,34 +679,39 @@ let usedRandomCategories = JSON.parse(
 
 function pickRandomCategory() {
 
-  // Remove anything from the used list that isn't in the current category pool
+  // Remove categories from the used list if they
+  // are no longer in the category pool.
   usedRandomCategories = usedRandomCategories.filter(used =>
     categoriesPool.some(
-      category => category.toLowerCase() === used.toLowerCase()
+      category =>
+        category.toLowerCase() === used.toLowerCase()
     )
   );
 
-  // Find categories that haven't been used yet
+  // Find categories that have not been used yet.
   let choices = categoriesPool.filter(category =>
     !usedRandomCategories.some(
-      used => used.toLowerCase() === category.toLowerCase()
+      used =>
+        used.toLowerCase() === category.toLowerCase()
     )
   );
 
-  // If we've used every category, start a new cycle
+  // If every category has been used,
+  // start a new random cycle.
   if (choices.length === 0) {
     usedRandomCategories = [];
     choices = [...categoriesPool];
   }
 
-  // Pick one randomly
+  // Pick a random unused category.
   const randomChoice =
     choices[Math.floor(Math.random() * choices.length)];
 
-  // Display it
-  document.getElementById('categoryInput').value = randomChoice;
+  // Display it.
+  document.getElementById('categoryInput').value =
+    randomChoice;
 
-  // Remember it
+  // Remember it.
   usedRandomCategories.push(randomChoice);
 
   localStorage.setItem(
@@ -698,12 +721,6 @@ function pickRandomCategory() {
 
   resetTimer();
 }
-
-    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
-    document.getElementById('categoryInput').value = randomChoice;
-    
-    resetTimer();
-  }
 
   function addCategoryToList() {
     const inputVal = document.getElementById('categoryInput').value.trim();
