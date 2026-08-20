@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classroom Game Hub</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #12181b;
+    color: #f0f4f8;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  h1 { text-align: center; color: #f59e0b; }
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+  .game-card {
+    background: #1e262c;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .game-card:hover {
+    transform: translateY(-4px);
+    border-color: #3b82f6;
+  }
+  .game-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: #3b82f6; }
+  .game-desc { font-size: 0.85rem; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+  <h1>🎮 Classroom Game Hub</h1>
+
+  <div class="game-grid">
+    <!-- Link directly to your HTML files -->
+    <a href="consonant-tug-of-war.html" class="game-card">
+      <div class="game-title">Tug-of-War</div>
+      <div class="game-desc">Consonant word battle for 2 teams.</div>
+    </a>
+
+    <a href="vocab-bingo.html" class="game-card">
+      <div class="game-title">Vocab Bingo</div>
+      <div class="game-desc">Random word generator for class bingo.</div>
+    </a>
+
+    <a href="spelling-race.html" class="game-card">
+      <div class="game-title">Spelling Race</div>
+      <div class="game-desc">Fast-paced spelling board game.</div>
+    </a>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consonant Tug-of-War</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Work+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #12181b;
+    --panel-bg: #1e262c;
+    --border: rgba(255, 255, 255, 0.12);
+    --text: #f0f4f8;
+    --text-dim: #94a3b8;
+    --team-a: #3b82f6;
+    --team-b: #ec4899;
+    --center-glow: #e2e8f0;
+    --score-goal: #eab308;
+    --timer-red: #ef4444;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 10px 16px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Work Sans', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wrap { max-width: 960px; margin: 0 auto; width: 100%; }
+
+  header { text-align: center; margin-bottom: 6px; }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--team-a), var(--team-b));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Teacher Setup Controls Bar */
+  .setup-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel-bg);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+  }
+  .setup-group { display: flex; align-items: center; gap: 5px; }
+  .setup-label { color: var(--text-dim); font-weight: 700; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.5px; }
+  .category-input, .target-input, .timer-input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    outline: none;
+  }
+  .category-input { width: 130px; font-weight: 700; color: #f59e0b; }
+  .target-input, .timer-input { width: 45px; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+  
+  .icon-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,0.18); }
+  .icon-btn.add-btn { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.4); color: #4ade80; }
+  .icon-btn.add-btn:hover { background: rgba(34, 197, 94, 0.35); }
+
+  /* Timer Display */
+  .timer-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--score-goal);
+    background: rgba(0,0,0,0.4);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    min-width: 60px;
+    text-align: center;
+  }
+  .timer-display.warning { color: var(--timer-red); animation: pulse 0.5s infinite alternate; }
+
+  @keyframes pulse {
+    from { opacity: 1; }
+    to { opacity: 0.4; }
+  }
+
+  /* Input Panel */
+  .inputs-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .team-card {
+    background: var(--panel-bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .team-card.a { border-color: var(--team-a); }
+  .team-card.b { border-color: var(--team-b); }
+
+  .team-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .team-name { font-size: 0.9rem; font-weight: 800; }
+  .team-card.a .team-name { color: var(--team-a); }
+  .team-card.b .team-name { color: var(--team-b); }
+
+  .team-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .word-input {
+    width: 100%;
+    padding: 5px 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    outline: none;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    white-space: nowrap;
+  }
+  .submit-btn:hover { filter: brightness(1.1); }
+
+  /* Compact Board Grid */
+  .grid-header {
+    display: grid;
+    grid-template-columns: 55px 1fr 55px;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .grid-rows { display: flex; flex-direction: column; gap: 2px; }
+
+  .letter-row {
+    display: grid;
+    grid-template-columns: 55px 1fr 55px;
+    align-items: center;
+    background: var(--panel-bg);
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+
+  .row-side-label {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+
+  .track {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 3px;
+    background: rgba(0,0,0,0.25);
+    padding: 2px;
+    border-radius: 4px;
+  }
+
+  .cell {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.01);
+  }
+
+  .cell.center { border-left: 1px dashed rgba(255,255,255,0.15); border-right: 1px dashed rgba(255,255,255,0.15); }
+  .cell.goal-a { background: rgba(59, 130, 246, 0.12); color: var(--team-a); font-weight: 700; }
+  .cell.goal-b { background: rgba(236, 72, 153, 0.12); color: var(--team-b); font-weight: 700; }
+
+  .cell .token {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .token.pos-center { background: #475569; color: var(--center-glow); }
+  .token.pos-a { background: var(--team-a); }
+  .token.pos-b { background: var(--team-b); }
+
+  /* Winner Screen Overlay */
+  .win-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 20, 0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .win-overlay.show { display: flex; }
+  .win-card {
+    background: var(--panel-bg);
+    border: 3px solid var(--score-goal);
+    padding: 30px 50px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(234, 179, 8, 0.3);
+  }
+  .win-card h2 {
+    font-size: 2.5rem;
+    margin: 0 0 10px;
+    color: var(--score-goal);
+    text-transform: uppercase;
+  }
+  .win-card p { font-size: 1.2rem; margin: 0 0 20px; color: var(--text-dim); }
+  .restart-btn {
+    background: var(--score-goal);
+    color: #000;
+    border: none;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 800;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Consonant Tug-of-War</h1>
+  </header>
+
+  <!-- Controls for Teacher Setup -->
+  <div class="setup-bar">
+    <div class="setup-group">
+      <span class="setup-label">Category:</span>
+      <input type="text" id="categoryInput" class="category-input" value="Animals" placeholder="Type Category...">
+      <button class="icon-btn" id="randomCatBtn" title="Pick Random Category & Reset Timer">🎲 New</button>
+      <button class="icon-btn add-btn" id="addCatBtn" title="Save current text box into the random category list">➕ Save</button>
+    </div>
+
+    <div class="setup-group">
+      <span class="setup-label">Goal Pts:</span>
+      <input type="number" id="targetScoreInput" class="target-input" value="5" min="1" max="20">
+    </div>
+
+    <div class="setup-group">
+      <span class="setup-label">Timer (s):</span>
+      <input type="number" id="timerConfigInput" class="timer-input" value="60" min="5" max="600" step="5">
+      <span class="timer-display" id="timerClock">01:00</span>
+      <button class="icon-btn" id="timerStartBtn">▶ Start</button>
+      <button class="icon-btn" id="timerResetBtn">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="inputs-container">
+    <div class="team-card a">
+      <div class="team-head">
+        <span class="team-name">Team 1</span>
+        <span class="team-score" id="scoreA">0 pts</span>
+      </div>
+      <input type="text" id="inputA" class="word-input" placeholder="Team 1 Word..." autocomplete="off">
+    </div>
+
+    <button class="submit-btn" id="playBtn">Play Turn</button>
+
+    <div class="team-card b">
+      <div class="team-head">
+        <span class="team-name">Team 2</span>
+        <span class="team-score" id="scoreB">0 pts</span>
+      </div>
+      <input type="text" id="inputB" class="word-input" placeholder="Team 2 Word..." autocomplete="off">
+    </div>
+  </div>
+
+  <div class="grid-header">
+    <span>Team 1</span>
+    <span>Grid Track (-4 to +4)</span>
+    <span>Team 2</span>
+  </div>
+
+  <div class="grid-rows" id="gridRows"></div>
+</div>
+
+<!-- Winner Screen -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <h2 id="winnerTitle">Team 1 Wins!</h2>
+    <p id="winnerSub">Reached the goal target!</p>
+    <button class="restart-btn" id="restartBtn">Play Again</button>
+  </div>
+</div>
+
+<script>
+  const CONSONANTS = "bcdfghjklmnpqrstvwxyz".split("");
+  const DEFAULT_CATEGORIES = [
+    "Animals", "Food & Drink", "Countries", "Sports", "Colors", 
+    "Jobs & Professions", "Clothing", "Vehicles", "Body Parts", 
+    "Things in a House", "School Subjects", "Verbs / Actions"
+  ];
+  
+  let categoriesPool = JSON.parse(localStorage.getItem('tugOfWarCategories')) || [...DEFAULT_CATEGORIES];
+
+  let positions = {};
+  let scores = { A: 0, B: 0 };
+
+  // Timer Variables
+  let timerInterval = null;
+  let timeRemaining = 60;
+  let isTimerRunning = false;
+
+  function initGame() {
+    CONSONANTS.forEach(c => positions[c] = 0);
+    scores.A = 0;
+    scores.B = 0;
+    document.getElementById('winOverlay').classList.remove('show');
+    resetTimer();
+    renderGrid();
+  }
+
+  function pickRandomCategory() {
+    const current = document.getElementById('categoryInput').value.trim();
+    const choices = categoriesPool.filter(c => c.toLowerCase() !== current.toLowerCase());
+    
+    if (choices.length === 0) {
+      alert("No other categories available!");
+      return;
+    }
+
+    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+    document.getElementById('categoryInput').value = randomChoice;
+    
+    resetTimer();
+  }
+
+  function addCategoryToList() {
+    const inputVal = document.getElementById('categoryInput').value.trim();
+    
+    if (!inputVal) {
+      alert("Please enter a category name first!");
+      return;
+    }
+
+    const exists = categoriesPool.some(cat => cat.toLowerCase() === inputVal.toLowerCase());
+    
+    if (exists) {
+      alert(`"${inputVal}" is already in your category pool!`);
+      return;
+    }
+
+    categoriesPool.push(inputVal);
+    localStorage.setItem('tugOfWarCategories', JSON.stringify(categoriesPool));
+    
+    alert(`Saved "${inputVal}" to your category list!`);
+  }
+
+  /* Timer Logic */
+  function updateTimerDisplay() {
+    const mins = Math.floor(timeRemaining / 60);
+    const secs = timeRemaining % 60;
+    const clockEl = document.getElementById('timerClock');
+    clockEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    
+    if (timeRemaining <= 10 && timeRemaining > 0) {
+      clockEl.classList.add('warning');
+    } else {
+      clockEl.classList.remove('warning');
+    }
+  }
+
+  function startTimer() {
+    if (isTimerRunning) {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      document.getElementById('timerStartBtn').textContent = "▶ Resume";
+      return;
+    }
+
+    if (timeRemaining <= 0) resetTimer();
+
+    isTimerRunning = true;
+    document.getElementById('timerStartBtn').textContent = "⏸ Pause";
+
+    timerInterval = setInterval(() => {
+      timeRemaining--;
+      updateTimerDisplay();
+
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        document.getElementById('timerStartBtn').textContent = "▶ Start";
+        alert("⏰ Time's up!");
+      }
+    }, 1000);
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    isTimerRunning = false;
+    const configVal = parseInt(document.getElementById('timerConfigInput').value, 10) || 60;
+    timeRemaining = configVal;
+    document.getElementById('timerStartBtn').textContent = "▶ Start";
+    updateTimerDisplay();
+  }
+
+  function renderGrid() {
+    const container = document.getElementById('gridRows');
+    container.innerHTML = '';
+
+    CONSONANTS.forEach(letter => {
+      const row = document.createElement('div');
+      row.className = 'letter-row';
+
+      const currentPos = positions[letter];
+
+      let trackHTML = '<div class="track">';
+      for (let i = -4; i <= 4; i++) {
+        let cellClass = 'cell';
+        if (i === 0) cellClass += ' center';
+        if (i === -4) cellClass += ' goal-a';
+        if (i === 4) cellClass += ' goal-b';
+
+        let cellContent = '';
+        if (i === -4 || i === 4) cellContent = '4';
+        else if (i !== 0) cellContent = Math.abs(i);
+
+        if (i === currentPos) {
+          let tokenClass = 'token pos-center';
+          if (currentPos < 0) tokenClass = 'token pos-a';
+          if (currentPos > 0) tokenClass = 'token pos-b';
+          
+          cellContent = `<div class="${tokenClass}">${letter.toUpperCase()}</div>`;
+        }
+
+        trackHTML += `<div class="${cellClass}">${cellContent}</div>`;
+      }
+      trackHTML += '</div>';
+
+      row.innerHTML = `
+        <div class="row-side-label">${currentPos < 0 ? Math.abs(currentPos) : ''}</div>
+        ${trackHTML}
+        <div class="row-side-label">${currentPos > 0 ? currentPos : ''}</div>
+      `;
+
+      container.appendChild(row);
+    });
+
+    document.getElementById('scoreA').textContent = `${scores.A} pts`;
+    document.getElementById('scoreB').textContent = `${scores.B} pts`;
+  }
+
+  function checkWinner() {
+    const targetScore = parseInt(document.getElementById('targetScoreInput').value, 10) || 5;
+    
+    if (scores.A >= targetScore || scores.B >= targetScore) {
+      clearInterval(timerInterval);
+      const winnerOverlay = document.getElementById('winOverlay');
+      const winnerTitle = document.getElementById('winnerTitle');
+      
+      if (scores.A > scores.B) {
+        winnerTitle.textContent = "Team 1 Wins!";
+        winnerTitle.style.color = "var(--team-a)";
+      } else if (scores.B > scores.A) {
+        winnerTitle.textContent = "Team 2 Wins!";
+        winnerTitle.style.color = "var(--team-b)";
+      } else {
+        winnerTitle.textContent = "It's a Tie!";
+        winnerTitle.style.color = "var(--score-goal)";
+      }
+      
+      winnerOverlay.classList.add('show');
+    }
+  }
+
+  function processTurn() {
+    const wordA = document.getElementById('inputA').value.toLowerCase().replace(/[^a-z]/g, '');
+    const wordB = document.getElementById('inputB').value.toLowerCase().replace(/[^a-z]/g, '');
+
+    if (!wordA || !wordB) {
+      alert("Please type a word for both teams before playing!");
+      return;
+    }
+
+    CONSONANTS.forEach(letter => {
+      const countA = (wordA.split(letter).length - 1);
+      const countB = (wordB.split(letter).length - 1);
+
+      const shift = countB - countA; 
+      let newPos = positions[letter] + shift;
+
+      if (newPos <= -4) {
+        scores.A += 1;
+        positions[letter] = 0;
+      } else if (newPos >= 4) {
+        scores.B += 1;
+        positions[letter] = 0;
+      } else {
+        positions[letter] = newPos;
+      }
+    });
+
+    document.getElementById('inputA').value = '';
+    document.getElementById('inputB').value = '';
+
+    // Pick a new random category for the next round
+    pickRandomCategory();
+
+    renderGrid();
+    checkWinner();
+  }
+
+  // Event Listeners
+  document.getElementById('playBtn').addEventListener('click', processTurn);
+  document.getElementById('randomCatBtn').addEventListener('click', pickRandomCategory);
+  document.getElementById('addCatBtn').addEventListener('click', addCategoryToList);
+  document.getElementById('restartBtn').addEventListener('click', initGame);
+
+  document.getElementById('timerStartBtn').addEventListener('click', startTimer);
+  document.getElementById('timerResetBtn').addEventListener('click', resetTimer);
+  document.getElementById('timerConfigInput').addEventListener('change', resetTimer);
+
+  document.getElementById('inputA').addEventListener('keydown', e => { if (e.key === 'Enter') processTurn(); });
+  document.getElementById('inputB').addEventListener('keydown', e => { if (e.key === 'Enter') processTurn(); });
+
+  // Initialize
+  initGame();
+</script>
+</body>
+</html>
