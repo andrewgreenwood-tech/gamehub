@@ -266,27 +266,34 @@
     border: 2px solid var(--border);
     padding: 24px 30px;
     border-radius: 12px;
-    max-width: 550px;
+    max-width: 650px;
     width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   }
   .modal-card h2 {
     margin-top: 0;
     color: var(--score-goal);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
   }
-  .modal-card ul {
-    padding-left: 20px;
-    margin: 15px 0;
-    line-height: 1.5;
-    font-size: 0.9rem;
-    color: var(--text-dim);
+  .modal-card h3 {
+    color: #3b82f6;
+    font-size: 1rem;
+    margin: 14px 0 6px;
   }
-  .modal-card ul li { margin-bottom: 8px; }
-  .modal-card ul strong { color: var(--text); }
+  .modal-card p, .modal-card ul, .modal-card ol {
+    line-height: 1.5;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 6px 0;
+  }
+  .modal-card ul, .modal-card ol { padding-left: 20px; }
+  .modal-card li { margin-bottom: 4px; }
+  .modal-card strong { color: var(--text); }
   
   .close-btn {
     background: var(--team-a);
@@ -296,15 +303,17 @@
     font-weight: 700;
     border-radius: 6px;
     cursor: pointer;
+    margin-top: 15px;
     float: right;
   }
 
   .win-card {
     border-color: var(--score-goal);
     text-align: center;
+    max-width: 450px;
   }
-  .win-card h2 { border: none; font-size: 2.5rem; margin-bottom: 10px; }
-  .win-card p { font-size: 1.2rem; margin-bottom: 20px; color: var(--text-dim); }
+  .win-card h2 { border: none; font-size: 2.2rem; margin-bottom: 10px; }
+  .win-card p { font-size: 1.1rem; margin-bottom: 20px; color: var(--text-dim); }
 </style>
 </head>
 <body>
@@ -373,19 +382,53 @@
 <!-- How to Play Overlay -->
 <div class="modal-overlay" id="rulesOverlay">
   <div class="modal-card">
-    <h2>📖 How to Play</h2>
+    <h2>🎯 Consonant Tug-of-War: How to Play</h2>
+    
+    <h3>1. Set Up the Game</h3>
+    <p>Before starting, the teacher chooses the game settings:</p>
     <ul>
-      <li><strong>Objective:</strong> Be the first team to pull consonants off the board to reach the Goal Points.</li>
-      <li><strong>Turn Steps:</strong>
-        <ol>
-          <li>Read the current <strong>Category</strong>.</li>
-          <li>Each team submits 1 valid word fitting the category before time runs out.</li>
-          <li>Click <strong>Play Turn</strong>.</li>
-        </ol>
-      </li>
-      <li><strong>Consonant Battle:</strong> Each matching consonant shifts toward the team that used it more times in their word.</li>
-      <li><strong>Scoring Points:</strong> If a consonant token reaches the outer edge (4 spots out), that team scores <strong>1 point</strong>, and the token resets to the center spot!</li>
+      <li><strong>Category</strong> – The teacher can type in a category or choose <em>New</em> to generate a random category.</li>
+      <li><strong>Goal Points</strong> – The teacher can use the default number of points or change it to set the winning score.</li>
+      <li><strong>Timer</strong> – The teacher can use the default time or change the timer for each turn.</li>
     </ul>
+    <p>When the settings are ready, the teacher presses <strong>Start</strong>.</p>
+
+    <h3>2. Choose a Word</h3>
+    <p>Each team thinks of a word that belongs to the category shown on the screen.</p>
+    <p><em>For example, if the category is Animals:</em></p>
+    <ul>
+      <li><strong>Team 1:</strong> CAT</li>
+      <li><strong>Team 2:</strong> HORSE</li>
+    </ul>
+    <p>The teacher types each team's word into the appropriate Team Word box. When both words have been entered, the teacher presses <strong>Play Turn</strong>.</p>
+
+    <h3>3. The Consonants Pull the Board</h3>
+    <p>Each consonant in a team's word pulls its corresponding letter one space toward that team. For example:</p>
+    <ul>
+      <li>One N = 1 space</li>
+      <li>Two N's = 2 spaces</li>
+      <li>Three N's = 3 spaces</li>
+    </ul>
+    <p>So, the more times a consonant appears in a word, the further that letter moves. If both teams have the same consonant, both teams pull that letter in opposite directions. The two pulls cancel each other out as appropriate.</p>
+
+    <h3>4. Score a Point</h3>
+    <p>When a letter is pulled all the way to the end of the board and falls off on a team's side:</p>
+    <ul>
+      <li>🏆 <strong>That team scores 1 point.</strong></li>
+      <li>The letter then returns to the middle of the board.</li>
+      <li>It can be pulled again during later turns.</li>
+    </ul>
+
+    <h3>5. Play the Next Turn</h3>
+    <p>The timer controls how long the teams have to think of their words. When the turn is over, the teacher enters the teams' new words and presses <strong>Play Turn</strong> again. The consonants move according to the letters in the new words. Keep playing until one team reaches the goal score.</p>
+
+    <h3>🏆 How to Win</h3>
+    <p>The first team to reach the Goal Points set at the beginning of the game wins! For example, if the goal is 5 points, the first team to reach 5 points wins the game.</p>
+    
+    <p style="text-align: center; font-weight: bold; color: var(--score-goal); margin-top: 15px;">
+      Think fast. Choose your words carefully. Pull the consonants to your side!
+    </p>
+
     <button class="close-btn" id="closeRulesBtn">Got It!</button>
   </div>
 </div>
