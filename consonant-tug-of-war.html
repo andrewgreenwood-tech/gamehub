@@ -683,17 +683,6 @@ function pickRandomCategory() {
     )
   );
 
-function pickRandomCategory() {
-
-  // Remove categories from the used list if they
-  // are no longer in the category pool.
-  usedRandomCategories = usedRandomCategories.filter(used =>
-    categoriesPool.some(
-      category =>
-        category.toLowerCase() === used.toLowerCase()
-    )
-  );
-
   // Find categories that have not been used yet.
   let choices = categoriesPool.filter(category =>
     !usedRandomCategories.some(
