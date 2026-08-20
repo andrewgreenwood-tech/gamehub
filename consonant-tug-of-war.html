@@ -89,6 +89,8 @@
   .icon-btn:hover { background: rgba(255,255,255,0.18); }
   .icon-btn.add-btn { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.4); color: #4ade80; }
   .icon-btn.add-btn:hover { background: rgba(34, 197, 94, 0.35); }
+  .icon-btn.rules-btn { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; }
+  .icon-btn.rules-btn:hover { background: rgba(59, 130, 246, 0.35); }
 
   /* Timer Display */
   .timer-display {
@@ -245,8 +247,8 @@
   .token.pos-a { background: var(--team-a); }
   .token.pos-b { background: var(--team-b); }
 
-  /* Winner Screen Overlay */
-  .win-overlay {
+  /* Winner & Rules Overlays */
+  .modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(10, 15, 20, 0.92);
@@ -255,33 +257,54 @@
     align-items: center;
     justify-content: center;
     z-index: 100;
+    padding: 20px;
   }
-  .win-overlay.show { display: flex; }
-  .win-card {
+  .modal-overlay.show { display: flex; }
+  
+  .modal-card {
     background: var(--panel-bg);
-    border: 3px solid var(--score-goal);
-    padding: 30px 50px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 0 40px rgba(234, 179, 8, 0.3);
+    border: 2px solid var(--border);
+    padding: 24px 30px;
+    border-radius: 12px;
+    max-width: 550px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   }
-  .win-card h2 {
-    font-size: 2.5rem;
-    margin: 0 0 10px;
+  .modal-card h2 {
+    margin-top: 0;
     color: var(--score-goal);
+    font-size: 1.5rem;
     text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
   }
-  .win-card p { font-size: 1.2rem; margin: 0 0 20px; color: var(--text-dim); }
-  .restart-btn {
-    background: var(--score-goal);
-    color: #000;
+  .modal-card ul {
+    padding-left: 20px;
+    margin: 15px 0;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .modal-card ul li { margin-bottom: 8px; }
+  .modal-card ul strong { color: var(--text); }
+  
+  .close-btn {
+    background: var(--team-a);
+    color: #fff;
     border: none;
-    padding: 10px 24px;
-    font-size: 1rem;
-    font-weight: 800;
+    padding: 8px 18px;
+    font-weight: 700;
     border-radius: 6px;
     cursor: pointer;
+    float: right;
   }
+
+  .win-card {
+    border-color: var(--score-goal);
+    text-align: center;
+  }
+  .win-card h2 { border: none; font-size: 2.5rem; margin-bottom: 10px; }
+  .win-card p { font-size: 1.2rem; margin-bottom: 20px; color: var(--text-dim); }
 </style>
 </head>
 <body>
@@ -296,8 +319,8 @@
     <div class="setup-group">
       <span class="setup-label">Category:</span>
       <input type="text" id="categoryInput" class="category-input" value="Animals" placeholder="Type Category...">
-      <button class="icon-btn" id="randomCatBtn" title="Pick Random Category & Reset Timer">🎲 New</button>
-      <button class="icon-btn add-btn" id="addCatBtn" title="Save current text box into the random category list">➕ Save</button>
+      <button class="icon-btn" id="randomCatBtn" title="Pick Random Category">🎲 New</button>
+      <button class="icon-btn add-btn" id="addCatBtn" title="Save category to list">➕ Save</button>
     </div>
 
     <div class="setup-group">
@@ -311,6 +334,10 @@
       <span class="timer-display" id="timerClock">01:00</span>
       <button class="icon-btn" id="timerStartBtn">▶ Start</button>
       <button class="icon-btn" id="timerResetBtn">↺ Reset</button>
+    </div>
+
+    <div class="setup-group">
+      <button class="icon-btn rules-btn" id="openRulesBtn">❓ How to Play</button>
     </div>
   </div>
 
@@ -343,12 +370,32 @@
   <div class="grid-rows" id="gridRows"></div>
 </div>
 
-<!-- Winner Screen -->
-<div class="win-overlay" id="winOverlay">
-  <div class="win-card">
+<!-- How to Play Overlay -->
+<div class="modal-overlay" id="rulesOverlay">
+  <div class="modal-card">
+    <h2>📖 How to Play</h2>
+    <ul>
+      <li><strong>Objective:</strong> Be the first team to pull consonants off the board to reach the Goal Points.</li>
+      <li><strong>Turn Steps:</strong>
+        <ol>
+          <li>Read the current <strong>Category</strong>.</li>
+          <li>Each team submits 1 valid word fitting the category before time runs out.</li>
+          <li>Click <strong>Play Turn</strong>.</li>
+        </ol>
+      </li>
+      <li><strong>Consonant Battle:</strong> Each matching consonant shifts toward the team that used it more times in their word.</li>
+      <li><strong>Scoring Points:</strong> If a consonant token reaches the outer edge (4 spots out), that team scores <strong>1 point</strong>, and the token resets to the center spot!</li>
+    </ul>
+    <button class="close-btn" id="closeRulesBtn">Got It!</button>
+  </div>
+</div>
+
+<!-- Winner Screen Overlay -->
+<div class="modal-overlay" id="winOverlay">
+  <div class="modal-card win-card">
     <h2 id="winnerTitle">Team 1 Wins!</h2>
     <p id="winnerSub">Reached the goal target!</p>
-    <button class="restart-btn" id="restartBtn">Play Again</button>
+    <button class="close-btn" style="float:none;" id="restartBtn">Play Again</button>
   </div>
 </div>
 
@@ -365,7 +412,6 @@
   let positions = {};
   let scores = { A: 0, B: 0 };
 
-  // Timer Variables
   let timerInterval = null;
   let timeRemaining = 60;
   let isTimerRunning = false;
@@ -563,9 +609,7 @@
     document.getElementById('inputA').value = '';
     document.getElementById('inputB').value = '';
 
-    // Pick a new random category for the next round
     pickRandomCategory();
-
     renderGrid();
     checkWinner();
   }
@@ -576,6 +620,14 @@
   document.getElementById('addCatBtn').addEventListener('click', addCategoryToList);
   document.getElementById('restartBtn').addEventListener('click', initGame);
 
+  // Rules Modal Handlers
+  document.getElementById('openRulesBtn').addEventListener('click', () => {
+    document.getElementById('rulesOverlay').classList.add('show');
+  });
+  document.getElementById('closeRulesBtn').addEventListener('click', () => {
+    document.getElementById('rulesOverlay').classList.remove('show');
+  });
+
   document.getElementById('timerStartBtn').addEventListener('click', startTimer);
   document.getElementById('timerResetBtn').addEventListener('click', resetTimer);
   document.getElementById('timerConfigInput').addEventListener('change', resetTimer);
@@ -583,7 +635,6 @@
   document.getElementById('inputA').addEventListener('keydown', e => { if (e.key === 'Enter') processTurn(); });
   document.getElementById('inputB').addEventListener('keydown', e => { if (e.key === 'Enter') processTurn(); });
 
-  // Initialize
   initGame();
 </script>
 </body>
