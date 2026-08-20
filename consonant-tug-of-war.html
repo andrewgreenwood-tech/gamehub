@@ -663,19 +663,25 @@
   let timeRemaining = 60;
   let isTimerRunning = false;
 
-  function initGame() {
-    CONSONANTS.forEach(c => positions[c] = 0);
-    scores.A = 0;
-    scores.B = 0;
-    document.getElementById('winOverlay').classList.remove('show');
-    resetTimer();
-    renderGrid();
-  }
+function initGame() {
+  CONSONANTS.forEach(c => positions[c] = 0);
+  scores.A = 0;
+  scores.B = 0;
+  document.getElementById('winOverlay').classList.remove('show');
+  resetTimer();
+  renderGrid();
+}
 
-  // Categories already used in the current random cycle
-let usedRandomCategories = JSON.parse(
-  localStorage.getItem('tugOfWarUsedRandomCategories')
-) || [];
+function pickRandomCategory() {
+
+  // Remove categories from the used list if they
+  // are no longer in the category pool.
+  usedRandomCategories = usedRandomCategories.filter(used =>
+    categoriesPool.some(
+      category =>
+        category.toLowerCase() === used.toLowerCase()
+    )
+  );
 
 function pickRandomCategory() {
 
