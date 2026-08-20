@@ -445,9 +445,195 @@
 <script>
   const CONSONANTS = "bcdfghjklmnpqrstvwxyz".split("");
   const DEFAULT_CATEGORIES = [
-    "Animals", "Food & Drink", "Countries", "Sports", "Colors", 
-    "Jobs & Professions", "Clothing", "Vehicles", "Body Parts", 
-    "Things in a House", "School Subjects", "Verbs / Actions"
+    // Animals & Nature
+    "Animals",
+    "Farm Animals",
+    "Wild Animals",
+    "Sea Animals",
+    "Birds",
+    "Insects",
+    "Pets",
+    "Animals That Fly",
+    "Animals That Swim",
+    "Animals with Four Legs",
+    "Animals That Are Dangerous",
+    "Animals You Might See at a Zoo",
+    "Animals You Might See in the Forest",
+    "Things in the Ocean",
+    "Things in a Forest",
+    "Things in a Garden",
+    "Flowers",
+    "Trees",
+  
+    // Food & Drink
+    "Food & Drink",
+    "Fruit",
+    "Vegetables",
+    "Desserts",
+    "Breakfast Foods",
+    "Fast Food",
+    "Drinks",
+    "Things You Eat Cold",
+    "Things You Eat Hot",
+    "Sweet Foods",
+    "Healthy Foods",
+    "Junk Food",
+    "Foods from Different Countries",
+    "Things You Find in a Kitchen",
+    "Things You Put on Pizza",
+    "Things You Eat at a Party",
+    "Things You Eat at Christmas",
+  
+    // People
+    "Jobs & Professions",
+    "Famous People",
+    "Family Members",
+    "People at School",
+    "People Who Help Us",
+    "People You Meet in a Town",
+    "People Who Work Outside",
+    "Characters",
+    "People You Might See at an Airport",
+    "People You Might See at a Hospital",
+  
+    // Places
+    "Countries",
+    "Cities",
+    "Places in a Town",
+    "Places at School",
+    "Places in a House",
+    "Places in Nature",
+    "Holiday Destinations",
+    "Places Near the Sea",
+    "Places Where You Can Buy Things",
+    "Places You Go on Holiday",
+    "Places You Might Go at the Weekend",
+  
+    // School & Home
+    "School Subjects",
+    "Things in a Classroom",
+    "Things in a School",
+    "Things in a Backpack",
+    "Things on a Desk",
+    "Things in a House",
+    "Things in a Bedroom",
+    "Things in a Kitchen",
+    "Things in a Bathroom",
+    "Things in a Living Room",
+    "Things in a Garage",
+    "Things You Take to School",
+    "Things You Take on Holiday",
+  
+    // Objects
+    "Things You Can Buy",
+    "Things You Can Carry",
+    "Things You Can Open",
+    "Things You Can Close",
+    "Things You Can Break",
+    "Things You Can Wear",
+    "Things You Wear on Your Head",
+    "Things You Wear on Your Feet",
+    "Things with Wheels",
+    "Things Made of Metal",
+    "Things Made of Plastic",
+    "Things Made of Wood",
+    "Things You Might Find in a Car",
+    "Things You Might Find in a Pocket",
+    "Things You Might Find Under a Bed",
+    "Things You Might Find in a Bag",
+  
+    // Activities
+    "Sports",
+    "Hobbies",
+    "Games",
+    "Outdoor Activities",
+    "Indoor Activities",
+    "Things You Can Do at School",
+    "Things You Can Do Outside",
+    "Things You Do in the Morning",
+    "Things You Do Before Bed",
+    "Things You Do at the Weekend",
+    "Things You Do on Holiday",
+  
+    // Language
+    "Verbs / Actions",
+    "Adjectives",
+    "Words That Describe People",
+    "Words That Describe Places",
+    "Words That Describe Food",
+  
+    // Descriptions
+    "Things That Are Big",
+    "Things That Are Small",
+    "Things That Are Fast",
+    "Things That Are Slow",
+    "Things That Are Easy",
+    "Things That Are Difficult",
+    "Things That Are Expensive",
+    "Things That Are Cheap",
+    "Things That Are Beautiful",
+    "Things That Are Ugly",
+    "Things That Are Funny",
+    "Things That Are Scary",
+  
+    // Colours & Shapes
+    "Colors",
+    "Things That Are Red",
+    "Things That Are Blue",
+    "Things That Are Green",
+    "Things That Are Yellow",
+    "Things That Are Black",
+    "Things That Are White",
+    "Things That Are Round",
+    "Things That Are Square",
+    "Things That Are Long",
+    "Things That Are Short",
+    "Things That Are Heavy",
+    "Things That Are Light",
+  
+    // Senses & Properties
+    "Things That Are Hot",
+    "Things That Are Cold",
+    "Things That Are Wet",
+    "Things That Are Dry",
+    "Things That Are Noisy",
+    "Things That Are Quiet",
+    "Things That Are Dangerous",
+    "Things That Smell Good",
+    "Things That Make Noise",
+    "Things You Can Hear",
+    "Things You Can See",
+    "Things You Can Smell",
+    "Things You Can Touch",
+    "Things You Can Taste",
+  
+    // Transport
+    "Vehicles",
+    "Cars",
+    "Things You See on a Road",
+    "Things at an Airport",
+    "Things at a Train Station",
+    "Things at a Bus Station",
+    "Things on a Ship",
+    "Things You Take on a Journey",
+  
+    // Fun / unusual
+    "Things You Might Find in a Park",
+    "Things You Might Find at the Beach",
+    "Things You Might Find at a Party",
+    "Things You Might Find at a Hotel",
+    "Things You Might Find at a Supermarket",
+    "Things You Might Find at a Restaurant",
+    "Things Associated with Summer",
+    "Things Associated with Winter",
+    "Things Associated with Christmas",
+    "Things Associated with Birthdays",
+    "Things You Would Not Take to School",
+    "Things That Fly",
+    "Things That Have Four Wheels",
+    "Things That Can Move",
+    "Things That Can Break",
+    "Things You Would Take on a Desert Island"
   ];
   
   let categoriesPool = JSON.parse(localStorage.getItem('tugOfWarCategories')) || [...DEFAULT_CATEGORIES];
@@ -468,14 +654,50 @@
     renderGrid();
   }
 
-  function pickRandomCategory() {
-    const current = document.getElementById('categoryInput').value.trim();
-    const choices = categoriesPool.filter(c => c.toLowerCase() !== current.toLowerCase());
-    
-    if (choices.length === 0) {
-      alert("No other categories available!");
-      return;
-    }
+  // Categories already used in the current random cycle
+let usedRandomCategories = JSON.parse(
+  localStorage.getItem('tugOfWarUsedRandomCategories')
+) || [];
+
+function pickRandomCategory() {
+
+  // Remove anything from the used list that isn't in the current category pool
+  usedRandomCategories = usedRandomCategories.filter(used =>
+    categoriesPool.some(
+      category => category.toLowerCase() === used.toLowerCase()
+    )
+  );
+
+  // Find categories that haven't been used yet
+  let choices = categoriesPool.filter(category =>
+    !usedRandomCategories.some(
+      used => used.toLowerCase() === category.toLowerCase()
+    )
+  );
+
+  // If we've used every category, start a new cycle
+  if (choices.length === 0) {
+    usedRandomCategories = [];
+    choices = [...categoriesPool];
+  }
+
+  // Pick one randomly
+  const randomChoice =
+    choices[Math.floor(Math.random() * choices.length)];
+
+  // Display it
+  document.getElementById('categoryInput').value = randomChoice;
+
+  // Remember it
+  usedRandomCategories.push(randomChoice);
+
+  localStorage.setItem(
+    'tugOfWarUsedRandomCategories',
+    JSON.stringify(usedRandomCategories)
+  );
+
+  resetTimer();
+}
 
     const randomChoice = choices[Math.floor(Math.random() * choices.length)];
     document.getElementById('categoryInput').value = randomChoice;
